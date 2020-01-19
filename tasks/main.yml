@@ -1,0 +1,5 @@
+---
+# tasks file for k8s
+- name: Install Docker
+  become: yes
+  include: docker.yml
