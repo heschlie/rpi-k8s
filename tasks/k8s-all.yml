@@ -24,6 +24,36 @@
     state: present
     filename: kubernetes.list
 
+# Ubuntu 19.04+ uses a newer version of iptables which is incompatible
+# with the kubelet.
+- name: Install legacy iptables
+  apt: 
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+      - iptables 
+      - arptables
+      - ebtables
+
+- name: Set legacy iptables versions
+  alternatives:
+    name: "{{ item.name }}"
+    path: "{{ item.path }}"
+  vars:
+    links:
+      - name: iptables
+        path: /usr/sbin/iptables-legacy
+      - name: ip6tables
+        path: /usr/sbin/ip6tables-legacy
+      - name: arptables
+        path: /usr/sbin/arptables-legacy
+      - name: ebtables
+        path: /usr/sbin/ebtables-legacy
+  with_items:
+    - "{{ links }}"
+
 - name: Install Kubernetes binaries
   apt: 
     name: "{{ packages }}"
@@ -31,12 +61,13 @@
     update_cache: yes
   vars:
     packages:
-      - kubelet 
-      - kubeadm 
-      - kubectl
+      - kubelet=1.17.2-00
+      - kubeadm=1.17.2-00
+      - kubectl=1.17.2-00
 
 - name: Configure node ip
   lineinfile:
+    create: yes
     path: /etc/default/kubelet
     line: KUBELET_EXTRA_ARGS=--node-ip={{ ansible_default_ipv4.address }}
 

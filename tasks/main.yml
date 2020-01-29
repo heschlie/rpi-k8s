@@ -1,5 +1,8 @@
 ---
-# tasks file for k8s
 - name: Install Docker
   become: yes
   include: docker.yml
+
+- name: Setup nodes for k8s
+  become: yes
+  include: k8s-all.yml
