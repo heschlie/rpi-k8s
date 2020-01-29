@@ -1,4 +1,15 @@
 ---
 # handlers file for k8s
 - name: docker status
+  become: yes
   service: name=docker state=started
+
+- name: restart docker
+  become: yes
+  service:
+    name: docker
+    state: restarted
+
+- name: reboot server
+  become: yes
+  reboot:

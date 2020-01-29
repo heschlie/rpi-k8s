@@ -1,0 +1,33 @@
+- name: Initialize the cluster
+  shell: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-cert-extra-sans {{ hostvars[groups['master'][0]] }} >> cluster_initialized.txt
+  args:
+    chdir: $HOME
+    creates: cluster_initialized.txt
+
+- name: Create .kube directory
+  become: yes
+  become_user: heschlie
+  file:
+    path: $HOME/.kube
+    state: directory
+    mode: 0755
+
+- name: Copy admin.conf to user's kube config
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /home/heschlie/.kube/config
+    remote_src: yes
+    owner: heschlie
+
+- name: Copy in the Calico manifest
+  copy:
+    src: calico.yaml
+    dest: /home/heschlie/calico.yaml
+    owner: heschlie
+
+- name: Install Calico
+  shell: kubectl apply -f /home/heschlie/calico.yaml >> pod_network_setup.txt
+  args:
+    creates: pod_network_setup.txt
+  become: yes
+  become_user: heschlie

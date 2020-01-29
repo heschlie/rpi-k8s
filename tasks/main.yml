@@ -6,3 +6,12 @@
 - name: Setup nodes for k8s
   become: yes
   include: k8s-all.yml
+
+- name: Setup master node
+  become: yes
+  include: k8s-master.yml
+  when: k8s_role == 'master'
+
+- name: Register nodes
+  become: yes
+  include: k8s-workers.yml

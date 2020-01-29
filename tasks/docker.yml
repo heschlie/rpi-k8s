@@ -34,3 +34,11 @@
     - containerd.io
   notify:
     - docker status
+
+- name: Adjust cgroup driver
+  replace:
+    path: /usr/lib/systemd/system/docker.service
+    regexp: '^ExecStart=\/usr\/bin\/dockerd -H fd:\/\/ --containerd=\/run\/containerd\/containerd.sock$'
+    replace: 'ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock --exec-opt native.cgroupdriver=systemd'
+  notify:
+    - restart docker
