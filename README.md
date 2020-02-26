@@ -1,7 +1,7 @@
 Role Name
 =========
 
-Stand up a k8s cluster
+Stand up a k8s cluster with Calico for networking
 
 Requirements
 ------------
